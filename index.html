@@ -1,0 +1,188 @@
+<!--
+🔥 LAWRY GALLERY - STREETWEAR STORE 🔥
+Tienda de sneakers y streetwear premium
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAWRY Gallery - Premium Streetwear Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Ops+One&family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- HEADER Y NAVEGACIÓN -->
+    <header>
+        <nav>
+            <div class="logo" onclick="location.reload()">
+                <!-- Logo clickeable que recarga -->
+                <img src="imagenes/Logo.png" alt="LAWRY" 
+                     onerror="this.src='imagenes/Logo.jpg'; this.onerror=function(){this.src='imagenes/Logo.svg'; this.onerror=function(){this.style.display='none'; document.querySelector('.logo-text').style.display='block';};}">
+                <span class="logo-text" style="display: none;">LAWRY</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#productos">SHOP</a></li>
+                <li><a href="#categorias">CATEGORÍAS</a></li>
+                <li><a href="#newsletter">NEWSLETTER</a></li>
+                <li>
+                    <button class="cart-btn" onclick="toggleCart()">
+                        🛒 CARRITO
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- SECCIÓN HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-image">
+                <!-- Imagen del personaje que flota -->
+                <img src="imagenes/WhatsApp_Image_2026-01-14_at_7_46_44_PM.jpeg" alt="LAWRY Character">
+            </div>
+            <h1>LAWRY<br>GALLERY</h1>
+            <p>Streetwear • Sneakers • Lifestyle</p>
+            <a href="#productos" class="cta-btn">SHOP NOW</a>
+        </div>
+    </section>
+
+    <!-- MARQUEE - Texto animado horizontal -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <span class="marquee-text">★ ENVÍO GRATIS ★ 100% AUTÉNTICO ★ SOPORTE 24/7 ★ LAWRY ★</span>
+            <span class="marquee-text">★ ENVÍO GRATIS ★ 100% AUTÉNTICO ★ SOPORTE 24/7 ★ LAWRY ★</span>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE PRODUCTOS -->
+    <section id="productos" class="section">
+        <h2 class="section-title">FEATURED DROPS</h2>
+        <!-- Botón para volver a ver TODOS los productos sin filtro -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <!-- onclick="loadProducts()" = cuando clickeas, ejecuta loadProducts sin parámetro = muestra TODO -->
+            <button onclick="loadProducts()" style="background: linear-gradient(135deg, #ff10f0, #00d9ff); color: white; border: none; padding: 0.8rem 2rem; cursor: pointer; font-family: 'Russo One', sans-serif; letter-spacing: 2px; border-radius: 5px;">VER TODO</button>
+        </div>
+        <!-- Grid vacío donde JavaScript carga los productos dinámicamente -->
+        <div class="products-grid" id="productsGrid"></div>
+    </section>
+
+    <!-- SECCIÓN DE ESTADÍSTICAS -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">10K+</div>
+                <div class="stat-label">Clientes Felices</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Productos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Auténtico</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Soporte</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN DE CATEGORÍAS -->
+    <section id="categorias" class="section">
+        <h2 class="section-title">CATEGORÍAS</h2>
+        <div class="categories-grid">
+            <!-- CATEGORÍA 1: SNEAKERS -->
+            <div class="category-card">
+                <div class="category-content">
+                    <div class="category-title">SNEAKERS</div>
+                    <!-- onclick="filterByCategory('SNEAKERS')" = cuando clickeas, filtra solo SNEAKERS -->
+                    <!-- Debe coincidir exactamente con category: 'SNEAKERS' en products -->
+                    <a onclick="filterByCategory('SNEAKERS')" class="category-link">VER TODO →</a>
+                </div>
+            </div>
+            
+            <!-- CATEGORÍA 2: DESIGNER -->
+            <div class="category-card">
+                <div class="category-content">
+                    <div class="category-title">DESIGNER</div>
+                    <!-- onclick="filterByCategory('DESIGNER')" = cuando clickeas, filtra solo DESIGNER -->
+                    <!-- Muestra todos los productos con category: 'DESIGNER' -->
+                    <a onclick="filterByCategory('DESIGNER')" class="category-link">VER TODO →</a>
+                </div>
+            </div>
+            
+            <!-- CATEGORÍA 3: LUXURY -->
+            <div class="category-card">
+                <div class="category-content">
+                    <div class="category-title">LUXURY</div>
+                    <!-- onclick="filterByCategory('LUXURY')" = cuando clickeas, filtra solo LUXURY -->
+                    <!-- Muestra todos los productos con category: 'LUXURY' -->
+                    <a onclick="filterByCategory('LUXURY')" class="category-link">VER TODO →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN NEWSLETTER -->
+    <section id="newsletter" class="newsletter">
+        <h2 class="newsletter-title">STAY FRESH</h2>
+        <p class="newsletter-subtitle">Únete y recibe drops exclusivos primero</p>
+        <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+            <input type="email" class="newsletter-input" placeholder="Tu email..." required>
+            <button type="submit" class="newsletter-btn">SUSCRÍBETE</button>
+        </form>
+    </section>
+
+    <!-- CARRITO (SIDEBAR) -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>CARRITO</h2>
+            <button class="close-cart" onclick="toggleCart()">×</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">
+                <p style="font-size: 4rem; margin-bottom: 1rem;">🛒</p>
+                <p>Tu carrito está vacío</p>
+            </div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-total">
+                <span class="cart-total-label">TOTAL:</span>
+                <span class="cart-total-amount" id="cartTotal">$0.00</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">CHECKOUT 🔥</button>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIÓN -->
+    <div class="notification" id="notification"></div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-socials">
+                <div class="social-icon">IG</div>
+                <div class="social-icon">TW</div>
+                <div class="social-icon">TK</div>
+                <div class="social-icon">YT</div>
+            </div>
+            <p class="footer-text">&copy; 2026 LAWRY Gallery. Todos los derechos reservados.</p>
+            <p class="footer-text">100% Autenticidad Garantizada • Envío Gratis • Soporte 24/7</p>
+        </div>
+        <div class="footer-brand">
+            <div class="footer-logo">
+                <img src="imagenes/Logo.png" alt="LAWRY" 
+                     onerror="this.src='imagenes/Logo.jpg'; this.onerror=function(){this.src='imagenes/Logo.svg'; this.onerror=function(){this.style.display='none';};}">
+            </div>
+            <p class="dev-credit">DEVELOPED BY</p>
+            <p class="dev-name">LEGACY TALKS DEV</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
