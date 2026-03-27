@@ -1,0 +1,236 @@
+{# ============================================================
+   templates/index.html  —  LAWRY Gallery tienda principal
+   Usa el diseño original del primer parcial pero con datos
+   reales que vienen de Flask y SQLite en lugar del array JS.
+   ============================================================ #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAWRY Gallery - Premium Streetwear Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Ops+One&family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+    {# ── HEADER semántico ── #}
+    <header>
+        <nav>
+            <div class="logo" onclick="location.href='{{ url_for('index') }}'">
+                <span class="logo-text">LAWRY</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#productos">SHOP</a></li>
+                <li><a href="#categorias">CATEGORÍAS</a></li>
+                <li><a href="#newsletter">NEWSLETTER</a></li>
+                {# Enlace al panel de administración CRUD #}
+                <li><a href="{{ url_for('admin') }}" class="admin-link">⚙️ ADMIN</a></li>
+                <li>
+                    <button class="cart-btn" onclick="toggleCart()">
+                        🛒 CARRITO
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    {# ── HERO ── #}
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='imagenes/WhatsApp_Image_2026-01-14_at_7_46_44_PM.jpeg') }}"
+                     alt="LAWRY Character"
+                     onerror="this.style.display='none'">
+            </div>
+            <h1>LAWRY<br>GALLERY</h1>
+            <p>Streetwear • Sneakers • Lifestyle</p>
+            <a href="#productos" class="cta-btn">SHOP NOW</a>
+        </div>
+    </section>
+
+    {# ── MARQUEE ── #}
+    <div class="marquee">
+        <div class="marquee-content">
+            <span class="marquee-text">★ ENVÍO GRATIS ★ 100% AUTÉNTICO ★ SOPORTE 24/7 ★ LAWRY ★</span>
+            <span class="marquee-text">★ ENVÍO GRATIS ★ 100% AUTÉNTICO ★ SOPORTE 24/7 ★ LAWRY ★</span>
+        </div>
+    </div>
+
+    {# ── SECCIÓN DE PRODUCTOS ── #}
+    <section id="productos" class="section">
+        <h2 class="section-title">FEATURED DROPS</h2>
+
+        {# Barra de búsqueda con Flask #}
+        <form class="search-bar-form" action="{{ url_for('index') }}" method="GET">
+            {% if categoria_actual %}
+                <input type="hidden" name="categoria" value="{{ categoria_actual }}">
+            {% endif %}
+            <input type="text" name="q" placeholder="Buscar sneaker..."
+                   value="{{ busqueda }}" class="search-bar-input">
+            <button type="submit" class="search-bar-btn">BUSCAR</button>
+            {% if busqueda or categoria_actual %}
+                <a href="{{ url_for('index') }}" class="clear-btn">VER TODO</a>
+            {% endif %}
+        </form>
+
+        {# Contador de resultados usando Jinja2 #}
+        <p class="results-count">
+            {{ productos | length }} producto{{ 's' if productos | length != 1 }}
+            {% if categoria_actual %} en <strong>{{ categoria_actual }}</strong>{% endif %}
+            {% if busqueda %} · "{{ busqueda }}"{% endif %}
+        </p>
+
+        {# ── GRID de productos generado con Jinja2 en lugar de JavaScript ── #}
+        <div class="products-grid" id="productsGrid">
+
+            {# Si no hay productos mostramos mensaje #}
+            {% if productos | length == 0 %}
+                <div class="empty-state-lawry">
+                    <p style="font-size:3rem">🔍</p>
+                    <p>Sin resultados. <a href="{{ url_for('index') }}">Ver todo</a></p>
+                </div>
+            {% endif %}
+
+            {# Iteramos cada producto que Flask nos mandó desde la BD #}
+            {% for p in productos %}
+            <div class="product-card" data-id="{{ p['id'] }}" data-category="{{ p['categoria'] }}">
+
+                {# Badge (HOT, FIRE, LIMITED) — solo se muestra si existe #}
+                {% if p['badge'] %}
+                    <div class="product-badge">{{ p['badge'] }}</div>
+                {% endif %}
+
+                {# Imagen del producto #}
+                <div class="product-image">
+                    <img src="{{ url_for('static', filename='imagenes/' + p['imagen']) }}"
+                         alt="{{ p['nombre'] }}"
+                         onerror="this.style.opacity='0.3'">
+                </div>
+
+                {# Info del producto #}
+                <div class="product-info">
+                    <div class="product-category">/// {{ p['categoria'] }}</div>
+                    <div class="product-name">{{ p['nombre'] }}</div>
+                    {# Precio formateado con Jinja2 — .2f = 2 decimales #}
+                    <div class="product-price">${{ "%.2f" | format(p['precio']) }}</div>
+
+                    {# Selector de tallas — generado desde la BD #}
+                    {# p['tallas_lista'] es la lista ["7","8","9"] que creamos en app.py #}
+                    <div class="size-selector" id="sizes-{{ p['id'] }}">
+                        {% for talla in p['tallas_lista'] %}
+                            <button class="size-btn"
+                                    onclick="selectSize(event, {{ p['id'] }}, '{{ talla }}')">
+                                {{ talla }}
+                            </button>
+                        {% endfor %}
+                    </div>
+
+                    <button class="add-to-cart" onclick="addToCart({{ p['id'] }}, '{{ p['nombre'] }}', {{ p['precio'] }}, '{{ p['imagen'] }}')">
+                        AGREGAR AL CARRITO
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>{# /products-grid #}
+    </section>
+
+    {# ── ESTADÍSTICAS ── #}
+    <section class="stats">
+        <div class="stats-grid">
+            {# Mostramos el total real de productos desde la BD con Jinja2 #}
+            <div class="stat-card">
+                <div class="stat-number">{{ productos | length }}+</div>
+                <div class="stat-label">Productos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">10K+</div>
+                <div class="stat-label">Clientes Felices</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Auténtico</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Soporte</div>
+            </div>
+        </div>
+    </section>
+
+    {# ── CATEGORÍAS — generadas dinámicamente desde la BD ── #}
+    <section id="categorias" class="section">
+        <h2 class="section-title">CATEGORÍAS</h2>
+        <div class="categories-grid">
+            {# categorias es la lista de categorías únicas que Flask nos mandó #}
+            {% for cat in categorias %}
+            <div class="category-card">
+                <div class="category-content">
+                    <div class="category-title">{{ cat['categoria'] }}</div>
+                    <a href="{{ url_for('index', categoria=cat['categoria']) }}"
+                       class="category-link">VER TODO →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# ── NEWSLETTER ── #}
+    <section id="newsletter" class="newsletter">
+        <h2 class="newsletter-title">STAY FRESH</h2>
+        <p class="newsletter-subtitle">Únete y recibe drops exclusivos primero</p>
+        <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+            <input type="email" class="newsletter-input" placeholder="Tu email..." required>
+            <button type="submit" class="newsletter-btn">SUSCRÍBETE</button>
+        </form>
+    </section>
+
+    {# ── CARRITO SIDEBAR ── #}
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>CARRITO</h2>
+            <button class="close-cart" onclick="toggleCart()">×</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">
+                <p style="font-size: 4rem; margin-bottom: 1rem;">🛒</p>
+                <p>Tu carrito está vacío</p>
+            </div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-total">
+                <span class="cart-total-label">TOTAL:</span>
+                <span class="cart-total-amount" id="cartTotal">$0.00</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">CHECKOUT 🔥</button>
+        </div>
+    </div>
+
+    {# ── NOTIFICACIÓN ── #}
+    <div class="notification" id="notification"></div>
+
+    {# ── FOOTER semántico ── #}
+    <footer>
+        <div class="footer-content">
+            <div class="footer-socials">
+                <div class="social-icon">IG</div>
+                <div class="social-icon">TW</div>
+                <div class="social-icon">TK</div>
+                <div class="social-icon">YT</div>
+            </div>
+            <p class="footer-text">&copy; 2026 LAWRY Gallery. Todos los derechos reservados.</p>
+            <p class="footer-text">Flask + SQLite • Jinja2 • JavaScript</p>
+        </div>
+        <div class="footer-brand">
+            <p class="dev-credit">DEVELOPED BY</p>
+            <p class="dev-name">LEGACY TALKS DEV</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

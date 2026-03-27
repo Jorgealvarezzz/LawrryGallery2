@@ -1,0 +1,99 @@
+{# ============================================================
+   templates/admin.html  —  Panel de administración CRUD
+   Permite agregar, editar y eliminar productos del catálogo.
+   ============================================================ #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAWRY Admin — Panel CRUD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo" onclick="location.href='{{ url_for('index') }}'">
+                <span class="logo-text">LAWRY</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}">← TIENDA</a></li>
+                <li><a href="{{ url_for('admin') }}" class="admin-link active">⚙️ ADMIN</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="admin-main">
+        <div class="admin-container">
+
+            <div class="admin-header">
+                <h1 class="admin-title">⚙️ PANEL DE ADMINISTRACIÓN</h1>
+                <p class="admin-subtitle">
+                    {# Mostramos total real de productos con Jinja2 #}
+                    {{ productos | length }} productos en el catálogo
+                </p>
+                <a href="{{ url_for('nuevo') }}" class="btn-admin-primary">+ NUEVO PRODUCTO</a>
+            </div>
+
+            {# ── Tabla de todos los productos ── #}
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Badge</th>
+                            <th>Tallas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {# Iteramos cada producto con Jinja2 #}
+                        {% for p in productos %}
+                        <tr>
+                            <td class="td-id">#{{ p['id'] }}</td>
+                            <td>
+                                <img src="{{ url_for('static', filename='imagenes/' + p['imagen']) }}"
+                                     alt="{{ p['nombre'] }}"
+                                     class="admin-thumb"
+                                     onerror="this.style.opacity='0.3'">
+                            </td>
+                            <td class="td-name">{{ p['nombre'] }}</td>
+                            <td>
+                                <span class="cat-tag">{{ p['categoria'] }}</span>
+                            </td>
+                            <td class="td-price">${{ "%.2f" | format(p['precio']) }}</td>
+                            <td>
+                                {% if p['badge'] %}
+                                    <span class="badge-tag">{{ p['badge'] }}</span>
+                                {% else %}
+                                    <span class="no-badge">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="td-tallas">{{ p['tallas'] }}</td>
+                            <td class="td-actions">
+                                <a href="{{ url_for('editar', id=p['id']) }}"
+                                   class="btn-edit-sm">EDITAR</a>
+                                <form action="{{ url_for('eliminar', id=p['id']) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('¿Eliminar {{ p['nombre'] }}?')">
+                                    <button type="submit" class="btn-delete-sm">ELIMINAR</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+{# ============================================================
+   templates/formulario.html  —  CREATE y UPDATE de productos
+   ============================================================ #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ "Editar" if accion == "editar" else "Nuevo" }} Producto — LAWRY Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo" onclick="location.href='{{ url_for('index') }}'">
+                <span class="logo-text">LAWRY</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}">← TIENDA</a></li>
+                <li><a href="{{ url_for('admin') }}">⚙️ ADMIN</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="admin-main">
+        <div class="form-admin-container">
+
+            <h1 class="admin-title">
+                {{ "✏️ EDITAR PRODUCTO" if accion == "editar" else "➕ NUEVO PRODUCTO" }}
+            </h1>
+            {% if accion == "editar" %}
+                <p class="admin-subtitle">Modificando: <strong>{{ producto['nombre'] }}</strong></p>
+            {% endif %}
+
+            <form method="POST"
+                  action="{{ url_for('actualizar', id=producto['id']) if accion == 'editar' else url_for('crear') }}"
+                  class="admin-form">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" name="nombre" required
+                               placeholder="Ej. Travis AJ1 Low Gold"
+                               value="{{ producto['nombre'] if producto else '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <select name="categoria" required>
+                            {% for cat in ['SNEAKERS', 'DESIGNER', 'LUXURY', 'BOOTS'] %}
+                                <option value="{{ cat }}"
+                                    {{ 'selected' if producto and producto['categoria'] == cat }}>
+                                    {{ cat }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Precio (USD) *</label>
+                        <input type="number" name="precio" required min="0" step="0.01"
+                               placeholder="0.00"
+                               value="{{ producto['precio'] if producto else '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Badge</label>
+                        <select name="badge">
+                            {% for b in ['', 'HOT', 'FIRE', 'LIMITED'] %}
+                                <option value="{{ b }}"
+                                    {{ 'selected' if producto and producto['badge'] == b }}>
+                                    {{ b if b else '— Sin badge —' }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre de imagen</label>
+                        <input type="text" name="imagen"
+                               placeholder="img01_lv_white.jpeg"
+                               value="{{ producto['imagen'] if producto else '' }}">
+                        <small>Debe estar en static/imagenes/</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Tallas (separadas por coma) *</label>
+                        <input type="text" name="tallas" required
+                               placeholder="7,7.5,8,8.5,9,9.5,10"
+                               value="{{ producto['tallas'] if producto else '' }}">
+                        <small>Ej: 6,7,8,9,10,11</small>
+                    </div>
+                </div>
+
+                {# Previsualización de la imagen #}
+                {% if producto and producto['imagen'] %}
+                <div class="img-preview-wrap">
+                    <img src="{{ url_for('static', filename='imagenes/' + producto['imagen']) }}"
+                         alt="Preview" class="img-preview"
+                         onerror="this.style.opacity='0.2'">
+                </div>
+                {% endif %}
+
+                <div class="form-actions">
+                    <a href="{{ url_for('admin') }}" class="btn-cancel">Cancelar</a>
+                    <button type="submit" class="btn-admin-primary">
+                        {{ "💾 GUARDAR CAMBIOS" if accion == "editar" else "🔥 AGREGAR PRODUCTO" }}
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>
